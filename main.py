@@ -13,6 +13,7 @@ sess = scpv2.Session(
 # ── 방법 1: client (저수준) ────────────────────────────────
 print("=== client 방식 ===")
 vpc_client = sess.client("vpc")
+vpc_client.
 result = vpc_client.list_vpcs(size=20, page=0)
 print(result)
 

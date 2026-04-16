@@ -14,8 +14,9 @@ scpv2/resources/data/*.json 을 읽어서 scpv2/stubs/ 디렉토리에 .pyi stub
 import json
 import os
 
-DATA_DIR = os.path.join("scpv2", "resources", "data")
-OUT_DIR  = os.path.join("scpv2", "stubs")
+DATA_DIR          = os.path.join("scpv2", "resources", "data")
+OUT_DIR           = os.path.join("scpv2", "stubs")   # 서비스별 Client 스텁
+SESSION_STUB_DIR  = "scpv2"                           # session.pyi — .py 파일 옆에 위치해야 Pylance가 인식
 
 # 파라미터 이름으로 Python 타입 추론
 PARAM_TYPE_MAP = {
@@ -123,7 +124,7 @@ def main():
         services.append(service_name)
 
     session_stub = _generate_session_stub(services)
-    session_stub_path = os.path.join(OUT_DIR, "session.pyi")
+    session_stub_path = os.path.join(SESSION_STUB_DIR, "session.pyi")
     with open(session_stub_path, "w") as f:
         f.write(session_stub + "\n")
     print(f"생성: {session_stub_path}")
