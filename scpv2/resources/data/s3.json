@@ -20,13 +20,15 @@
             }
         },
         "list_objects_v2": {
-            "params": ["bucket"],
+            "params": ["bucket", "prefix", "max_keys", "continuation_token"],
             "response": {
                 "Bucket": "$bucket",
                 "Contents": [
                     {"Key": "file1.txt", "Size": 512},
                     {"Key": "file2.txt", "Size": 1024}
-                ]
+                ],
+                "IsTruncated": false,
+                "KeyCount": 2
             }
         }
     },
@@ -42,6 +44,23 @@
         "upload": {
             "params": ["bucket", "key", "body"],
             "delegates_to": "put_object"
+        }
+    },
+    "paginators": {
+        "list_objects_v2": {
+            "input_token":      "continuation_token",
+            "limit_key":        "max_keys",
+            "result_key":       "Contents",
+            "starting_token":   null,
+            "default_page_size": 1000
+        }
+    },
+    "collections": {
+        "objects": {
+            "method":     "list_objects_v2",
+            "result_key": "Contents",
+            "page_param": "continuation_token",
+            "size_param": "max_keys"
         }
     }
 }

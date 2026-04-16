@@ -47,5 +47,56 @@
             "params": ["vpc_id"],
             "delegates_to": "delete_vpc"
         }
+    },
+    "paginators": {
+        "list_vpcs": {
+            "input_token":      "page",
+            "limit_key":        "size",
+            "result_key":       "contents",
+            "starting_token":   0,
+            "default_page_size": 20
+        }
+    },
+    "waiters": {
+        "vpc_active": {
+            "operation":    "list_vpcs",
+            "delay":        5,
+            "max_attempts": 20,
+            "acceptors": [
+                {
+                    "matcher":  "path",
+                    "argument": "contents[0].vpcState",
+                    "expected": "ACTIVE",
+                    "state":    "success"
+                },
+                {
+                    "matcher":  "path",
+                    "argument": "contents[0].vpcState",
+                    "expected": "ERROR",
+                    "state":    "failure"
+                }
+            ]
+        },
+        "vpc_deleted": {
+            "operation":    "list_vpcs",
+            "delay":        5,
+            "max_attempts": 20,
+            "acceptors": [
+                {
+                    "matcher":  "path",
+                    "argument": "contents",
+                    "expected": null,
+                    "state":    "success"
+                }
+            ]
+        }
+    },
+    "collections": {
+        "vpcs": {
+            "method":     "list_vpcs",
+            "result_key": "contents",
+            "page_param": "page",
+            "size_param": "size"
+        }
     }
 }

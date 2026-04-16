@@ -41,5 +41,62 @@
             "params": ["virtual_server_id"],
             "delegates_to": "stop_virtual_server"
         }
+    },
+    "paginators": {
+        "list_virtual_servers": {
+            "input_token":      "page",
+            "limit_key":        "page_count",
+            "result_key":       "contents",
+            "starting_token":   0,
+            "default_page_size": 20
+        }
+    },
+    "waiters": {
+        "virtual_server_running": {
+            "operation":    "describe_virtual_server",
+            "delay":        10,
+            "max_attempts": 30,
+            "acceptors": [
+                {
+                    "matcher":  "path",
+                    "argument": "virtualServerState",
+                    "expected": "RUNNING",
+                    "state":    "success"
+                },
+                {
+                    "matcher":  "path",
+                    "argument": "virtualServerState",
+                    "expected": "ERROR",
+                    "state":    "failure"
+                }
+            ]
+        },
+        "virtual_server_stopped": {
+            "operation":    "describe_virtual_server",
+            "delay":        10,
+            "max_attempts": 30,
+            "acceptors": [
+                {
+                    "matcher":  "path",
+                    "argument": "virtualServerState",
+                    "expected": "STOPPED",
+                    "state":    "success"
+                },
+                {
+                    "matcher":  "path",
+                    "argument": "virtualServerState",
+                    "expected": "ERROR",
+                    "state":    "failure"
+                }
+            ]
+        }
+    },
+    "collections": {
+        "virtual_servers": {
+            "method":     "list_virtual_servers",
+            "result_key": "contents",
+            "page_param": "page",
+            "size_param": "page_count"
+        }
     }
 }

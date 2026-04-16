@@ -1,0 +1,9 @@
+# 소스 배포(sdist)에서 제외할 파일/디렉토리
+exclude main.py
+recursive-exclude scripts *
+recursive-exclude tests *
+recursive-exclude docs *
+recursive-exclude .claude *
+recursive-exclude .venv *
+global-exclude __pycache__
+global-exclude *.py[cod]

@@ -2,11 +2,11 @@
 from __future__ import annotations
 from typing import Literal, overload
 
-from scpv2.ec2_client import Ec2Client
-from scpv2.s3_client import S3Client
-from scpv2.subnet_client import SubnetClient
-from scpv2.virtualserver_client import VirtualserverClient
-from scpv2.vpc_client import VpcClient
+from scpv2.stubs.ec2_client import Ec2Client
+from scpv2.stubs.s3_client import S3Client
+from scpv2.stubs.subnet_client import SubnetClient
+from scpv2.stubs.virtualserver_client import VirtualserverClient
+from scpv2.stubs.vpc_client import VpcClient
 
 class Session:
     @overload
