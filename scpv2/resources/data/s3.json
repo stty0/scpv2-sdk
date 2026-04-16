@@ -1,0 +1,47 @@
+{
+    "service_name": "s3",
+    "client_methods": {
+        "get_object": {
+            "params": ["bucket", "key"],
+            "response": {
+                "Bucket": "$bucket",
+                "Key": "$key",
+                "Body": "<contents of $key>",
+                "ContentType": "application/octet-stream",
+                "ContentLength": 1024
+            }
+        },
+        "put_object": {
+            "params": ["bucket", "key", "body"],
+            "response": {
+                "Bucket": "$bucket",
+                "Key": "$key",
+                "ETag": "\"abc123def456\""
+            }
+        },
+        "list_objects_v2": {
+            "params": ["bucket"],
+            "response": {
+                "Bucket": "$bucket",
+                "Contents": [
+                    {"Key": "file1.txt", "Size": 512},
+                    {"Key": "file2.txt", "Size": 1024}
+                ]
+            }
+        }
+    },
+    "resource_methods": {
+        "Bucket": {
+            "params": ["bucket_name"],
+            "delegates_to": "list_objects_v2"
+        },
+        "Object": {
+            "params": ["bucket", "key"],
+            "delegates_to": "get_object"
+        },
+        "upload": {
+            "params": ["bucket", "key", "body"],
+            "delegates_to": "put_object"
+        }
+    }
+}

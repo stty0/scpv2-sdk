@@ -1,0 +1,37 @@
+{
+    "service_name": "subnet",
+    "api_name": "vpc",
+    "version": "1.2",
+    "client_methods": {
+        "create_subnet": {
+            "params": ["name", "cidr", "type", "vpc_id", "description", "gateway_ip_address", "allocation_pools", "dns_nameservers", "host_routes", "tags"],
+            "required": ["name", "cidr", "type", "vpc_id"],
+            "body_params": ["name", "cidr", "type", "vpc_id", "description", "gateway_ip_address", "allocation_pools", "dns_nameservers", "host_routes", "tags"],
+            "http_method": "POST",
+            "path": "/v1/subnets",
+            "validation": {
+                "name": {
+                    "type": "regex",
+                    "pattern": "^[a-zA-Z0-9-]{3,20}$",
+                    "message": "name은 영문/숫자/하이픈 조합, 3~20자이어야 합니다"
+                },
+                "cidr": {
+                    "type": "regex",
+                    "pattern": "^(10\\.\\d{1,3}|172\\.(1[6-9]|2[0-9]|3[01])|192\\.168)\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$",
+                    "message": "cidr은 사설 IP 대역이어야 합니다 (예: 192.168.1.0/24)"
+                },
+                "type": {
+                    "type": "enum",
+                    "values": ["GENERAL", "LOCAL", "VPC_ENDPOINT"],
+                    "message": "지원하지 않는 subnet type입니다"
+                }
+            }
+        }
+    },
+    "resource_methods": {
+        "create": {
+            "params": ["name", "cidr", "type", "vpc_id", "description", "gateway_ip_address", "allocation_pools", "dns_nameservers", "host_routes", "tags"],
+            "delegates_to": "create_subnet"
+        }
+    }
+}

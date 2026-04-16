@@ -1,0 +1,45 @@
+{
+    "service_name": "virtualserver",
+    "api_name": "virtualserver",
+    "version": "1.2",
+    "client_methods": {
+        "list_virtual_servers": {
+            "params": ["virtual_server_name", "page", "page_count"],
+            "http_method": "GET",
+            "path": "/vpc/v2/virtual-servers"
+        },
+        "describe_virtual_server": {
+            "params": ["virtual_server_id"],
+            "http_method": "GET",
+            "path": "/vpc/v2/virtual-servers/{virtual_server_id}"
+        },
+        "start_virtual_server": {
+            "params": ["virtual_server_id"],
+            "http_method": "POST",
+            "path": "/vpc/v2/virtual-servers/{virtual_server_id}/start"
+        },
+        "stop_virtual_server": {
+            "params": ["virtual_server_id"],
+            "http_method": "POST",
+            "path": "/vpc/v2/virtual-servers/{virtual_server_id}/stop"
+        }
+    },
+    "resource_methods": {
+        "list": {
+            "params": ["virtual_server_name", "page", "page_count"],
+            "delegates_to": "list_virtual_servers"
+        },
+        "get": {
+            "params": ["virtual_server_id"],
+            "delegates_to": "describe_virtual_server"
+        },
+        "start": {
+            "params": ["virtual_server_id"],
+            "delegates_to": "start_virtual_server"
+        },
+        "stop": {
+            "params": ["virtual_server_id"],
+            "delegates_to": "stop_virtual_server"
+        }
+    }
+}
