@@ -9,18 +9,38 @@ class ScpError(Exception):
 
 class ClientError(ScpError):
     """SCP API가 에러 응답을 반환했을 때 발생
-    - response['code']    : 에러 코드 (예: 'ResourceNotFound')
-    - response['message'] : 에러 메시지
+
+    Attributes:
+        response (dict):        원본 에러 응답 dict (_status, _body 항상 포함)
+        operation_name (str):   호출한 메서드 이름
+        status_code (int):      HTTP 상태 코드
     """
+
+    # 단일 에러 객체에서 코드를 찾을 필드명 후보 (우선순위 순)
+    _CODE_FIELDS    = ("code", "errorCode", "resultCode", "error", "title")
+    # 단일 에러 객체에서 메시지를 찾을 필드명 후보
+    _MESSAGE_FIELDS = ("detail", "message", "errorMessage", "resultDescription", "reason")
+
     def __init__(self, error_response: dict, operation_name: str):
-        code = error_response.get("code", error_response.get("errorCode", "Unknown"))
-        message = error_response.get("message", error_response.get("errorMessage", "Unknown"))
+        # SCP API: {"errors": [{...}]} 배열 형식 처리
+        first_error = (error_response.get("errors") or [None])[0] or error_response
+
+        code = next(
+            (first_error[f] for f in self._CODE_FIELDS if first_error.get(f)),
+            error_response.get("_status", "Unknown"),
+        )
+        message = next(
+            (first_error[f] for f in self._MESSAGE_FIELDS if first_error.get(f)),
+            error_response.get("_body", "Unknown"),
+        )
         super().__init__(
             f"An error occurred ({code}) when calling the "
             f"{operation_name} operation: {message}"
         )
-        self.response = error_response
+        self.response       = error_response
         self.operation_name = operation_name
+        self.status_code    = first_error.get("status") or error_response.get("_status")
+        self.request_id     = first_error.get("request_id") or first_error.get("global_request_id")
 
 
 class ValidationError(ScpError):

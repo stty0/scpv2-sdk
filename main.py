@@ -13,7 +13,7 @@ sess = scpv2.Session(
 # ── 방법 1: client (저수준) ────────────────────────────────
 print("=== client 방식 ===")
 vpc_client = sess.client("vpc")
-vpc_client.
+vpc_client.create_subnet()
 result = vpc_client.list_vpcs(size=20, page=0)
 print(result)
 
@@ -26,3 +26,12 @@ print(result)
 # resource로 생성/삭제도 동일하게 가능
 # vpc.create(name="my-vpc", cidr="10.0.0.0/24")
 # vpc.delete(vpc_id="...")
+
+# ── VPC 삭제 ────────────────────────────────
+# try:
+#     vpc_client.delete_vpc(vpc_id="9b82587f27ca4d5db67bf40b01740f83")
+# except scpv2.ClientError as e:
+#     print(e.status_code)   # 404
+#     print(e.request_id)    # req-3cbc1905-...
+#     if e.response["errors"][0]["code"] == "ResourceNotFound":
+#         print("VPC가 존재하지 않습니다.")

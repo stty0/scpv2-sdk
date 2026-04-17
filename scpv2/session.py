@@ -122,10 +122,10 @@ class Client:
             try:
                 error_data = http_resp.json()
             except Exception:
-                error_data = {
-                    "code":    str(http_resp.status_code),
-                    "message": http_resp.text,
-                }
+                error_data = {}
+            # HTTP 상태코드와 raw body는 항상 포함 (필드명이 달라도 디버깅 가능)
+            error_data.setdefault("_status", http_resp.status_code)
+            error_data.setdefault("_body",   http_resp.text)
             raise ClientError(error_data, operation_name)
 
         raise ClientError(

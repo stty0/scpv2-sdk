@@ -22,6 +22,40 @@
             "params": ["virtual_server_id"],
             "http_method": "POST",
             "path": "/vpc/v2/virtual-servers/{virtual_server_id}/stop"
+        },
+        "create_server": {
+            "params": [
+                "image_id", "keypair_name", "name", "networks", "server_type_id", "volumes",
+                "file_storage_ids", "lock", "max_count", "metadata", "partition_number",
+                "product_category", "product_offering", "security_groups", "server_group_id",
+                "tags", "user_data"
+            ],
+            "required": ["image_id", "keypair_name", "name", "networks", "server_type_id", "volumes"],
+            "body_params": [
+                "image_id", "keypair_name", "name", "networks", "server_type_id", "volumes",
+                "file_storage_ids", "lock", "max_count", "metadata", "partition_number",
+                "product_category", "product_offering", "security_groups", "server_group_id",
+                "tags", "user_data"
+            ],
+            "http_method": "POST",
+            "path": "/v1/servers",
+            "validation": {
+                "name": {
+                    "type": "regex",
+                    "pattern": "^[a-zA-Z0-9-_ ]{1,63}$",
+                    "message": "name은 영문/숫자/하이픈/언더스코어/공백 조합, 1~63자이어야 합니다"
+                },
+                "product_category": {
+                    "type": "enum",
+                    "values": ["compute", "container"],
+                    "message": "지원하지 않는 product_category입니다"
+                },
+                "product_offering": {
+                    "type": "enum",
+                    "values": ["virtual_server", "gpu_server", "k8s_vm", "k8s_gpu_vm"],
+                    "message": "지원하지 않는 product_offering입니다"
+                }
+            }
         }
     },
     "resource_methods": {
@@ -40,6 +74,15 @@
         "stop": {
             "params": ["virtual_server_id"],
             "delegates_to": "stop_virtual_server"
+        },
+        "create": {
+            "params": [
+                "image_id", "keypair_name", "name", "networks", "server_type_id", "volumes",
+                "file_storage_ids", "lock", "max_count", "metadata", "partition_number",
+                "product_category", "product_offering", "security_groups", "server_group_id",
+                "tags", "user_data"
+            ],
+            "delegates_to": "create_server"
         }
     },
     "paginators": {
