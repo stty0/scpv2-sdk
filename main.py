@@ -13,7 +13,10 @@ sess = scpv2.Session(
 # ── 방법 1: client (저수준) ────────────────────────────────
 print("=== client 방식 ===")
 vpc_client = sess.client("vpc")
-vpc_client.create_subnet()
+try:
+    vpc_client.create_subnet()
+except  AttributeError as e:
+    pass
 result = vpc_client.list_vpcs(size=20, page=0)
 print(result)
 
@@ -35,3 +38,27 @@ print(result)
 #     print(e.request_id)    # req-3cbc1905-...
 #     if e.response["errors"][0]["code"] == "ResourceNotFound":
 #         print("VPC가 존재하지 않습니다.")
+
+result = vpc_client.list_vpcs()
+print(result)  # 원본 응답 전체 출력
+
+# collection으로 확인
+items = list(vpc.vpcs.all())
+print(f"총 {len(items)}개")
+
+
+# 전체 순회
+for v in vpc.vpcs.all():
+    print(v["state"])
+
+vpc.vpcs.all()
+
+paginator = vpc_client.get_paginator("list_vpcs")
+for page in paginator.paginate(size=10):
+    for vpc in page["vpcs"]:
+        print(vpc["name"])
+
+# 전체 결과를 한 번에 수집
+result = paginator.paginate(size=10).build_full_result()
+all_vpcs = result["vpcs"]
+print(all_vpcs)

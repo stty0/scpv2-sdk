@@ -52,7 +52,7 @@
         "list_vpcs": {
             "input_token":      "page",
             "limit_key":        "size",
-            "result_key":       "contents",
+            "result_key":       "vpcs",
             "starting_token":   0,
             "default_page_size": 20
         }
@@ -94,7 +94,7 @@
     "collections": {
         "vpcs": {
             "method":     "list_vpcs",
-            "result_key": "contents",
+            "result_key": "vpcs",
             "page_param": "page",
             "size_param": "size"
         }

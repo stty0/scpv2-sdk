@@ -1,0 +1,36 @@
+{
+    "service_name": "keypair",
+    "api_name": "keypair",
+    "version": "1.0",
+    "client_methods": {
+        "list_keypairs": {
+            "params": ["limit", "marker"],
+            "http_method": "GET",
+            "path": "/v1/keypairs"
+        },
+        "create_keypair": {
+            "params": ["name", "public_key", "tags"],
+            "required": ["name"],
+            "body_params": ["name", "public_key", "tags"],
+            "http_method": "POST",
+            "path": "/v1/keypairs",
+            "validation": {
+                "name": {
+                    "type": "regex",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,62}$",
+                    "message": "name은 영문/숫자/하이픈/언더스코어 조합, 1~63자이어야 합니다"
+                }
+            }
+        }
+    },
+    "resource_methods": {
+        "list": {
+            "params": ["limit", "marker"],
+            "delegates_to": "list_keypairs"
+        },
+        "create": {
+            "params": ["name", "public_key", "tags"],
+            "delegates_to": "create_keypair"
+        }
+    }
+}

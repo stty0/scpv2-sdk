@@ -2,17 +2,18 @@
 from __future__ import annotations
 from typing import Literal, overload
 
-from scpv2.stubs.ec2_client import Ec2Client
-from scpv2.stubs.s3_client import S3Client
+from scpv2.stubs.keypair_client import KeypairClient
+from scpv2.stubs.keypair_resource import KeypairResource
 from scpv2.stubs.subnet_client import SubnetClient
+from scpv2.stubs.subnet_resource import SubnetResource
 from scpv2.stubs.virtualserver_client import VirtualserverClient
+from scpv2.stubs.virtualserver_resource import VirtualserverResource
 from scpv2.stubs.vpc_client import VpcClient
+from scpv2.stubs.vpc_resource import VpcResource
 
 class Session:
     @overload
-    def client(self, service_name: Literal["ec2"]) -> Ec2Client: ...
-    @overload
-    def client(self, service_name: Literal["s3"]) -> S3Client: ...
+    def client(self, service_name: Literal["keypair"]) -> KeypairClient: ...
     @overload
     def client(self, service_name: Literal["subnet"]) -> SubnetClient: ...
     @overload
@@ -20,3 +21,13 @@ class Session:
     @overload
     def client(self, service_name: Literal["vpc"]) -> VpcClient: ...
     def client(self, service_name: str) -> object: ...
+
+    @overload
+    def resource(self, service_name: Literal["keypair"]) -> KeypairResource: ...
+    @overload
+    def resource(self, service_name: Literal["subnet"]) -> SubnetResource: ...
+    @overload
+    def resource(self, service_name: Literal["virtualserver"]) -> VirtualserverResource: ...
+    @overload
+    def resource(self, service_name: Literal["vpc"]) -> VpcResource: ...
+    def resource(self, service_name: str) -> object: ...

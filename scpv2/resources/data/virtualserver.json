@@ -6,22 +6,13 @@
         "list_virtual_servers": {
             "params": ["virtual_server_name", "page", "page_count"],
             "http_method": "GET",
-            "path": "/vpc/v2/virtual-servers"
+            "path": "/v1/servers"
         },
-        "describe_virtual_server": {
-            "params": ["virtual_server_id"],
+        "show_virtual_server": {
+            "params": ["server_id"],
+            "required": ["server_id"],
             "http_method": "GET",
-            "path": "/vpc/v2/virtual-servers/{virtual_server_id}"
-        },
-        "start_virtual_server": {
-            "params": ["virtual_server_id"],
-            "http_method": "POST",
-            "path": "/vpc/v2/virtual-servers/{virtual_server_id}/start"
-        },
-        "stop_virtual_server": {
-            "params": ["virtual_server_id"],
-            "http_method": "POST",
-            "path": "/vpc/v2/virtual-servers/{virtual_server_id}/stop"
+            "path": "/v1/servers/{server_id}"
         },
         "create_server": {
             "params": [
@@ -56,6 +47,18 @@
                     "message": "지원하지 않는 product_offering입니다"
                 }
             }
+        },
+        "start_virtual_server": {
+            "params": ["server_id"],
+            "required": ["server_id"],
+            "http_method": "POST",
+            "path": "/v1/servers/{server_id}/start"
+        },
+        "stop_virtual_server": {
+            "params": ["server_id"],
+            "required": ["server_id"],
+            "http_method": "POST",
+            "path": "/v1/servers/{server_id}/stop"
         }
     },
     "resource_methods": {
@@ -64,16 +67,8 @@
             "delegates_to": "list_virtual_servers"
         },
         "get": {
-            "params": ["virtual_server_id"],
-            "delegates_to": "describe_virtual_server"
-        },
-        "start": {
-            "params": ["virtual_server_id"],
-            "delegates_to": "start_virtual_server"
-        },
-        "stop": {
-            "params": ["virtual_server_id"],
-            "delegates_to": "stop_virtual_server"
+            "params": ["server_id"],
+            "delegates_to": "show_virtual_server"
         },
         "create": {
             "params": [
@@ -83,20 +78,28 @@
                 "tags", "user_data"
             ],
             "delegates_to": "create_server"
+        },
+        "start": {
+            "params": ["server_id"],
+            "delegates_to": "start_virtual_server"
+        },
+        "stop": {
+            "params": ["server_id"],
+            "delegates_to": "stop_virtual_server"
         }
     },
     "paginators": {
         "list_virtual_servers": {
-            "input_token":      "page",
-            "limit_key":        "page_count",
-            "result_key":       "contents",
-            "starting_token":   0,
+            "input_token":       "page",
+            "limit_key":         "page_count",
+            "result_key":        "contents",
+            "starting_token":    0,
             "default_page_size": 20
         }
     },
     "waiters": {
         "virtual_server_running": {
-            "operation":    "describe_virtual_server",
+            "operation":    "show_virtual_server",
             "delay":        10,
             "max_attempts": 30,
             "acceptors": [
@@ -115,7 +118,7 @@
             ]
         },
         "virtual_server_stopped": {
-            "operation":    "describe_virtual_server",
+            "operation":    "show_virtual_server",
             "delay":        10,
             "max_attempts": 30,
             "acceptors": [
