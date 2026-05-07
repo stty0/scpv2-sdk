@@ -1,64 +1,36 @@
 """
 main.py — 개발/테스트용 진입점 (패키지에 포함되지 않음)
 """
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import scpv2
 
+if TYPE_CHECKING:
+    from scpv2.stubs.vpc_client import VpcClient
+    from scpv2.stubs.subnet_client import SubnetClient
+
 sess = scpv2.Session(
-    access_key="75874cea2857479c947a0bf41ced821c",
-    secret_key="2388d32f-d63c-4ec8-8499-21974c506fae",
+    access_key="046d43fc60bf48fbb0d839e2e2711bef",
+    secret_key="a13fe202-ce57-4db3-ba52-38898958e959",
     region="kr-west1",
-    environment="e",
+    environment="s",
 )
 
-# ── 방법 1: client (저수준) ────────────────────────────────
-print("=== client 방식 ===")
-vpc_client = sess.client("vpc")
-try:
-    vpc_client.create_subnet()
-except  AttributeError as e:
-    pass
+vpc_client: VpcClient = sess.client("vpc")
+
 result = vpc_client.list_vpcs(size=20, page=0)
+print(result["vpcs"])
+print()
+
+
+subnet_client: SubnetClient = sess.client("subnet")
+result = subnet_client.list_subnets()
+
+# subnet_client.create_subnet(
+#     name="publicSubnet",
+#     cidr="192.168.10.0/24",
+#     type="GENERAL",
+#     vpc_id="5d9f027797ca4e20b68db1c652576347"
+# )
 print(result)
-
-# ── 방법 2: resource (고수준) ──────────────────────────────
-print("\n=== resource 방식 ===")
-vpc = sess.resource("vpc")
-result = vpc.list(size=20, page=0)   # list_vpcs 로 위임
-print(result)
-
-# resource로 생성/삭제도 동일하게 가능
-# vpc.create(name="my-vpc", cidr="10.0.0.0/24")
-# vpc.delete(vpc_id="...")
-
-# ── VPC 삭제 ────────────────────────────────
-# try:
-#     vpc_client.delete_vpc(vpc_id="9b82587f27ca4d5db67bf40b01740f83")
-# except scpv2.ClientError as e:
-#     print(e.status_code)   # 404
-#     print(e.request_id)    # req-3cbc1905-...
-#     if e.response["errors"][0]["code"] == "ResourceNotFound":
-#         print("VPC가 존재하지 않습니다.")
-
-result = vpc_client.list_vpcs()
-print(result)  # 원본 응답 전체 출력
-
-# collection으로 확인
-items = list(vpc.vpcs.all())
-print(f"총 {len(items)}개")
-
-
-# 전체 순회
-for v in vpc.vpcs.all():
-    print(v["state"])
-
-vpc.vpcs.all()
-
-paginator = vpc_client.get_paginator("list_vpcs")
-for page in paginator.paginate(size=10):
-    for vpc in page["vpcs"]:
-        print(vpc["name"])
-
-# 전체 결과를 한 번에 수집
-result = paginator.paginate(size=10).build_full_result()
-all_vpcs = result["vpcs"]
-print(all_vpcs)

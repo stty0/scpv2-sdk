@@ -103,15 +103,25 @@ sess = scpv2.Session(
 
 ### Client (저수준 API)
 
+IDE 자동완성을 활용하려면 타입 힌트를 명시하는 것을 권장합니다.
+
 ```python
-vpc_client = sess.client("vpc")
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from scpv2.stubs.vpc_client import VpcClient
+    from scpv2.stubs.subnet_client import SubnetClient
+
+# 타입 힌트를 지정하면 IDE에서 해당 서비스 메서드만 자동완성됩니다
+vpc_client: VpcClient = sess.client("vpc")
 
 # VPC 목록 조회
 result = vpc_client.list_vpcs(size=20, page=0)
-print(result["contents"])
+print(result["vpcs"])
 
 # VPC 생성
-vpc = vpc_client.create_vpc(
+vpc_client.create_vpc(
     name="my-vpc",
     cidr="10.0.0.0/24",
     description="My first VPC",
@@ -119,12 +129,22 @@ vpc = vpc_client.create_vpc(
 
 # VPC 삭제
 vpc_client.delete_vpc(vpc_id="VPC_ID")
+
+# 다른 서비스도 동일하게 타입 힌트 지정
+subnet_client: SubnetClient = sess.client("subnet")
+result = subnet_client.list_subnets(vpc_id="VPC_ID")
 ```
 
 ### Resource (고수준 OOP API)
 
 ```python
-vpc = sess.resource("vpc")
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from scpv2.stubs.vpc_resource import VpcResource
+
+vpc: VpcResource = sess.resource("vpc")
 
 # client 메서드를 의미있는 이름으로 접근
 result = vpc.list()
@@ -144,12 +164,12 @@ paginator = vpc_client.get_paginator("list_vpcs")
 
 # 페이지 단위로 순회
 for page in paginator.paginate(size=10):
-    for vpc in page["contents"]:
-        print(vpc["vpcName"])
+    for vpc in page["vpcs"]:
+        print(vpc["name"])
 
 # 전체 결과를 한 번에 수집
 result = paginator.paginate(size=10).build_full_result()
-all_vpcs = result["contents"]
+all_vpcs = result["vpcs"]
 ```
 
 ---
@@ -178,10 +198,10 @@ vpc = sess.resource("vpc")
 
 # 전체 순회
 for v in vpc.vpcs.all():
-    print(v["vpcName"])
+    print(v["name"])
 
 # 필터 적용
-for v in vpc.vpcs.filter(vpcState="ACTIVE"):
+for v in vpc.vpcs.filter(state="ACTIVE"):
     print(v)
 
 # 페이지 크기 지정
@@ -260,9 +280,8 @@ sess = scpv2.Session(
 |---|---|
 | `"vpc"` | VPC 생성 / 조회 / 삭제 |
 | `"subnet"` | 서브넷 생성 |
-| `"virtualserver"` | 가상 서버 목록 / 상세 / 시작 / 중지 |
-| `"ec2"` | EC2 인스턴스 (Mock) |
-| `"s3"` | 오브젝트 스토리지 (Mock) |
+| `"virtualserver"` | 가상 서버 목록 / 상세 / 생성 / 시작 / 중지 |
+| `"keypair"` | 키페어 목록 조회 / 생성 |
 
 ---
 

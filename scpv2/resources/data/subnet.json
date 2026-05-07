@@ -3,6 +3,11 @@
     "api_name": "vpc",
     "version": "1.2",
     "client_methods": {
+        "list_subnets": {
+            "params": ["size", "page", "sort", "id", "name", "type", "cidr", "state", "vpc_id", "vpc_name"],
+            "http_method": "GET",
+            "path": "/v1/subnets"
+        },
         "create_subnet": {
             "params": ["name", "cidr", "type", "vpc_id", "description", "gateway_ip_address", "allocation_pools", "dns_nameservers", "host_routes", "tags"],
             "required": ["name", "cidr", "type", "vpc_id"],
@@ -28,7 +33,28 @@
             }
         }
     },
+    "paginators": {
+        "list_subnets": {
+            "input_token":       "page",
+            "limit_key":         "size",
+            "result_key":        "subnets",
+            "starting_token":    0,
+            "default_page_size": 20
+        }
+    },
+    "collections": {
+        "subnets": {
+            "method":     "list_subnets",
+            "result_key": "subnets",
+            "page_param": "page",
+            "size_param": "size"
+        }
+    },
     "resource_methods": {
+        "list": {
+            "params": ["size", "page", "sort", "id", "name", "type", "cidr", "state", "vpc_id", "vpc_name"],
+            "delegates_to": "list_subnets"
+        },
         "create": {
             "params": ["name", "cidr", "type", "vpc_id", "description", "gateway_ip_address", "allocation_pools", "dns_nameservers", "host_routes", "tags"],
             "delegates_to": "create_subnet"
