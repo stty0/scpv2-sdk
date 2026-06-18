@@ -1,7 +1,7 @@
 """
-scpv2.credentials — 자격증명 관리 (botocore.credentials와 동일한 구조)
+scpv2.credentials — 자격증명 관리
 
-자격증명 탐색 순서 (boto3와 동일):
+자격증명 탐색 순서:
     1. ExplicitProvider  — Session(access_key=..., secret_key=...)
     2. EnvProvider       — 환경변수 SCP_ACCESS_KEY / SCP_SECRET_KEY
     3. FileProvider      — ~/.scp/credential.json
@@ -127,7 +127,7 @@ class FileProvider:
     def load(self) -> Credentials | None:
         if not os.path.exists(self.CREDENTIAL_FILE):
             return None
-        with open(self.CREDENTIAL_FILE) as f:
+        with open(self.CREDENTIAL_FILE, encoding="utf-8") as f:
             raw = json.load(f)
 
         # 다중 프로파일 형식 감지: 최상위에 access_key가 없으면 프로파일 형식
@@ -159,7 +159,7 @@ class FileProvider:
 # ── Credential Resolver ─────────────────────────────────────────────────────
 
 class CredentialResolver:
-    """자격증명 체인 리졸버 — providers 순서대로 시도 (botocore.credentials.CredentialResolver와 동일)"""
+    """자격증명 체인 리졸버 — providers를 순서대로 시도해 처음 찾은 자격증명을 반환"""
 
     def __init__(self, providers: list):
         self.providers = providers

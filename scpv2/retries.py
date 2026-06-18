@@ -1,9 +1,10 @@
 """
-scpv2.retries — 재시도 로직 (botocore.retries와 동일한 구조)
+scpv2.retries — API 호출 실패 시 재시도 로직
 
-boto3 대응:
-    RetryConfig  ←→ botocore.config.Config(retries={"max_attempts": 3, "mode": "standard"})
-    RetryHandler ←→ botocore.retries.standard.StandardRetryHandler
+사용 예::
+
+    from scpv2 import RetryConfig
+    sess = scpv2.Session(retry_config=RetryConfig(max_attempts=5, mode="standard"))
 """
 import random
 import time

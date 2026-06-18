@@ -11,10 +11,10 @@ if TYPE_CHECKING:
     from scpv2.stubs.subnet_client import SubnetClient
 
 sess = scpv2.Session(
-    access_key="046d43fc60bf48fbb0d839e2e2711bef",
-    secret_key="a13fe202-ce57-4db3-ba52-38898958e959",
+    access_key="315d15c78c10482b964d06f07a0f1c3c",
+    secret_key="82f18371-4222-454a-856e-ed69baf40368",
     region="kr-west1",
-    environment="s",
+    environment="e"
 )
 
 vpc_client: VpcClient = sess.client("vpc")

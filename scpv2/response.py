@@ -1,8 +1,5 @@
 """
-scpv2.response — HTTP 응답을 boto3 스타일 dict로 변환
-
-boto3 대응:
-    build_response ←→ botocore.parsers.BaseRestParser._do_parse()
+scpv2.response — HTTP 응답을 ResponseMetadata가 포함된 dict로 변환
 
 모든 성공 응답에 ResponseMetadata가 포함됩니다::
 

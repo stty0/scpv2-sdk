@@ -1,11 +1,3 @@
-"""
-scpv2.session — Session / Client / ServiceResource (boto3.session과 동일한 구조)
-
-boto3 대응:
-    Session         ←→ boto3.Session
-    Client          ←→ botocore.client.BaseClient
-    ServiceResource ←→ boto3.resources.base.ServiceResource
-"""
 import os
 import requests as _requests
 
@@ -23,7 +15,7 @@ from .waiter      import Waiter
 # ── 저수준 Client ────────────────────────────────────────────────────────────
 
 class Client:
-    """저수준 API 베이스 클래스 (botocore.client.BaseClient와 동일)
+    """저수준 API 베이스 클래스
 
     서브클래스는 Session.register()가 type()으로 동적 생성합니다.
     직접 인스턴스화하지 않고 session.client("서비스명")으로 획득합니다.
@@ -104,6 +96,7 @@ class Client:
                 headers=headers,
                 params=query_params,
                 json=body,
+                proxies={"http": "", "https": ""} if self._session.no_proxy else None,
             )
 
             if http_resp.ok:
@@ -136,7 +129,7 @@ class Client:
     # ── Paginator / Waiter ────────────────────────────────────────────────
 
     def get_paginator(self, operation_name: str) -> Paginator:
-        """페이지네이터를 반환합니다 (boto3 client.get_paginator와 동일)
+        """페이지네이터를 반환합니다
 
         Args:
             operation_name: 페이지네이션할 Client 메서드 이름 (예: "list_vpcs")
@@ -158,7 +151,7 @@ class Client:
         return Paginator(method, configs[operation_name])
 
     def get_waiter(self, waiter_name: str) -> Waiter:
-        """웨이터를 반환합니다 (boto3 client.get_waiter와 동일)
+        """웨이터를 반환합니다
 
         Args:
             waiter_name: 웨이터 이름 (예: "vpc_active")
@@ -187,7 +180,7 @@ class Client:
 # ── 고수준 ServiceResource ───────────────────────────────────────────────────
 
 class ServiceResource:
-    """고수준 OOP API 베이스 클래스 (boto3.resources.base.ServiceResource와 동일)
+    """고수준 OOP API 베이스 클래스
 
     서브클래스는 Session.register()가 type()으로 동적 생성합니다.
     CollectionManager 디스크립터가 주입되어 .vpcs, .virtual_servers 등 컬렉션 속성을 제공합니다.
@@ -200,13 +193,13 @@ class ServiceResource:
 # ── 동적 클래스 팩토리 ────────────────────────────────────────────────────────
 
 def _make_client(service_name: str, methods: dict) -> type:
-    """Client 서브클래스를 동적 생성 (boto3 ClientCreator와 동일)"""
+    """Client 서브클래스를 동적 생성"""
     attrs = {"_service_name": service_name, **methods}
     return type(service_name.upper(), (Client,), attrs)
 
 
 def _make_resource(service_name: str, methods: dict, collection_managers: dict = None) -> type:
-    """ServiceResource 서브클래스를 동적 생성 (boto3 ResourceFactory와 동일)
+    """ServiceResource 서브클래스를 동적 생성
 
     CollectionManager 디스크립터를 attrs에 포함시키면 __set_name__이 자동 호출됩니다.
     """
@@ -217,23 +210,31 @@ def _make_resource(service_name: str, methods: dict, collection_managers: dict =
 # ── Session ──────────────────────────────────────────────────────────────────
 
 class Session:
-    """SCP 연결 및 서비스 클라이언트 관리 (boto3.Session과 동일)
+    """SCP(Samsung Cloud Platform) 연결 및 서비스 클라이언트 관리
+
+    자격증명/리전/환경 정보를 보관하고, client()/resource()로
+    서비스별 인스턴스를 생성·캐싱(싱글톤)합니다.
 
     자격증명 탐색 순서:
         1. 생성자 파라미터 (access_key, secret_key)
         2. 환경변수 SCP_ACCESS_KEY / SCP_SECRET_KEY
         3. ~/.scp/credential.json (profile_name 지정 가능)
 
+    region / environment / language 도 동일한 우선순위
+    (파라미터 → 환경변수 → credential.json → 기본값)로 결정됩니다.
+
     사용 예::
 
-        # 자동 탐색
-        sess = scpv2.Session()
-
-        # 명시적 자격증명
+        sess = scpv2.Session()                       # 자동 탐색
         sess = scpv2.Session(access_key="...", secret_key="...", region="kr-west1")
+        sess = scpv2.Session(profile_name="prod")     # 프로파일 지정
 
-        # 프로파일 지정
-        sess = scpv2.Session(profile_name="prod")
+        client = sess.client("vpc")                  # 저수준 Client
+        result = client.list_vpcs()
+
+        resource = sess.resource("vpc")               # 고수준 Resource
+        for vpc in resource.all():
+            print(vpc.id, vpc.name)
     """
 
     # 서비스 레지스트리 (모든 Session 인스턴스가 공유)
@@ -251,6 +252,7 @@ class Session:
         language:     str = None,
         profile_name: str = "default",
         retry_config: RetryConfig = None,
+        no_proxy:     bool = False,
     ):
         file_provider = FileProvider(profile_name=profile_name)
         resolver = CredentialResolver([
@@ -260,6 +262,7 @@ class Session:
         ])
         self.credentials  = resolver.resolve()
         self.retry_config = retry_config or RetryConfig()
+        self.no_proxy     = no_proxy
 
         file_data = file_provider.data
         self.region = (
@@ -313,14 +316,14 @@ class Session:
     # ── 클라이언트 / 리소스 반환 ─────────────────────────────────────────
 
     def client(self, service_name: str) -> Client:
-        """저수준 Client 반환 — 서비스별 싱글톤 (boto3 session.client와 동일)"""
+        """저수준 Client 반환 — 서비스별 싱글톤"""
         if service_name not in self._clients:
             client_class = self._client_registry[service_name]
             self._clients[service_name] = client_class(session=self)
         return self._clients[service_name]
 
     def resource(self, service_name: str) -> ServiceResource:
-        """고수준 ServiceResource 반환 — 서비스별 싱글톤 (boto3 session.resource와 동일)"""
+        """고수준 ServiceResource 반환 — 서비스별 싱글톤"""
         if service_name not in self._resources:
             resource_class = self._resource_registry[service_name]
             self._resources[service_name] = resource_class(client=self.client(service_name))

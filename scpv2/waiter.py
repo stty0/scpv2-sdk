@@ -1,8 +1,5 @@
 """
-scpv2.waiter — 웨이터 (boto3.waiters와 동일한 구조)
-
-boto3 대응:
-    Waiter ←→ botocore.waiter.Waiter
+scpv2.waiter — 리소스가 특정 상태가 될 때까지 폴링하는 웨이터
 
 JSON 서비스 정의 스키마::
 
@@ -78,7 +75,7 @@ def _resolve_path(data: Any, path: str) -> Any:
 class Waiter:
     """리소스가 특정 상태가 될 때까지 폴링하는 웨이터
 
-    boto3와 동일하게 client.get_waiter(waiter_name)으로 획득합니다.
+    client.get_waiter(waiter_name)으로 획득합니다.
     """
 
     def __init__(self, name: str, config: dict, client):

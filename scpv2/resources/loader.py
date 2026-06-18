@@ -1,5 +1,5 @@
 """
-scpv2.resources.loader — JSON 서비스 정의를 Session에 등록 (botocore.loaders.Loader와 동일)
+scpv2.resources.loader — JSON 서비스 정의를 읽어 Session에 Client/Resource 메서드로 등록
 """
 import json
 import os
@@ -133,7 +133,7 @@ def _make_resource_method(method_name: str, delegates_to: str):
 # ── ServiceLoader ────────────────────────────────────────────────────────────
 
 class ServiceLoader:
-    """JSON 서비스 정의 파일을 읽어 Session에 등록 (botocore.loaders.Loader와 동일)"""
+    """JSON 서비스 정의 파일을 읽어 Session에 등록"""
 
     DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
@@ -145,7 +145,7 @@ class ServiceLoader:
 
     @classmethod
     def load(cls, filepath: str):
-        with open(filepath) as f:
+        with open(filepath, encoding="utf-8") as f:
             definition = json.load(f)
 
         service_name    = definition["service_name"]

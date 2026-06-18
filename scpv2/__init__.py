@@ -1,7 +1,7 @@
 """
 scpv2 — Samsung SDS SCP v2 Python SDK
 
-boto3와 동일한 개발자 경험을 제공하는 SCP(Samsung Cloud Platform) SDK입니다.
+SCP(Samsung Cloud Platform) API를 호출하기 위한 Python SDK입니다.
 
 기본 사용법::
 

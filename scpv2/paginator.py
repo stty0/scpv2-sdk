@@ -1,9 +1,5 @@
 """
-scpv2.paginator — 페이지네이터 (boto3.paginate와 동일한 구조)
-
-boto3 대응:
-    Paginator    ←→ botocore.paginate.Paginator
-    PageIterator ←→ botocore.paginate.PageIterator
+scpv2.paginator — 여러 페이지에 걸친 목록 API를 자동으로 순회하는 페이지네이터
 
 JSON 서비스 정의 스키마::
 
@@ -94,7 +90,7 @@ class PageIterator:
 class Paginator:
     """특정 API 작업에 대한 페이지네이터
 
-    boto3와 동일하게 client.get_paginator(operation_name)으로 획득합니다.
+    client.get_paginator(operation_name)으로 획득합니다.
     """
 
     PAGE_ITERATOR_CLASS = PageIterator

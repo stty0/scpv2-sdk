@@ -1,9 +1,5 @@
 """
-scpv2.collection — 컬렉션 (boto3.resources.collection과 동일한 구조)
-
-boto3 대응:
-    Collection        ←→ boto3.resources.collection.ResourceCollection
-    CollectionManager ←→ boto3.resources.collection.CollectionManager
+scpv2.collection — resource의 목록 속성을 자동 페이지네이션으로 순회하는 컬렉션
 
 JSON 서비스 정의 스키마::
 
@@ -38,7 +34,7 @@ class Collection:
     """자동 페이지네이션을 지원하는 리소스 컬렉션 이터레이터
 
     filter(), all(), page_size(), limit() 호출은 새 Collection을 반환하여
-    메서드 체이닝을 지원합니다 (boto3와 동일).
+    메서드 체이닝을 지원합니다.
     """
 
     def __init__(
@@ -75,7 +71,7 @@ class Collection:
     # ── 체이닝 메서드 ─────────────────────────────────────────────────────
 
     def all(self) -> "Collection":
-        """필터 없이 전체 컬렉션 반환 (boto3와 동일)"""
+        """필터 없이 전체 컬렉션 반환"""
         return self
 
     def filter(self, **kwargs) -> "Collection":

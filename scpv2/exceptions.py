@@ -1,5 +1,5 @@
 """
-scpv2.exceptions — SCP SDK 예외 계층 (botocore.exceptions와 동일한 구조)
+scpv2.exceptions — SCP SDK 예외 계층
 """
 
 

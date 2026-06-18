@@ -260,7 +260,7 @@ def main():
             continue
 
         filepath = os.path.join(DATA_DIR, filename)
-        with open(filepath) as f:
+        with open(filepath, encoding="utf-8") as f:
             definition = json.load(f)
 
         service_name = definition["service_name"]
